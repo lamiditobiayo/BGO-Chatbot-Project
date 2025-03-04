@@ -1,33 +1,23 @@
-import os
 from flask import Flask, request, jsonify
-import openai
-from dotenv import load_dotenv
-
-# Load API key from .env file
-load_dotenv()
-client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 app = Flask(__name__)
 
+@app.route("/", methods=["GET"])
+def home():
+    return jsonify({"message": "Welcome to the BGO Chatbot API!"})
+
 @app.route("/chat", methods=["POST"])
 def chat():
-    data = request.json
-    user_message = data.get("message", "")
-
-    if not user_message:
+    data = request.get_json()
+    if not data or "message" not in data:
         return jsonify({"error": "No message provided"}), 400
 
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4o",  # Change to "gpt-4o-mini" if needed
-            messages=[{"role": "user", "content": user_message}]
-        )
+    user_message = data["message"]
 
-        chatbot_reply = response.choices[0].message.content  # Correct response extraction
-        return jsonify({"response": chatbot_reply})
+    # Dummy response (replace with OpenAI API logic)
+    chatbot_response = f"Chatbot says: {user_message}"
 
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500  # Handle API errors correctly
+    return jsonify({"response": chatbot_response})
 
 if __name__ == "__main__":
     app.run(debug=True)
